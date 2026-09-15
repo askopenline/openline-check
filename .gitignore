@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.bak
+*.bak-*
+.DS_Store
+.vscode/
+.idea/
+node_modules/
+dist/
