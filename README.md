@@ -1,68 +1,55 @@
-# Openline eSIM Compatibility Check
+# Openline eSIM Compatibility
 
-**Live:** [openline-comp.pplx.app](https://openline-comp.pplx.app) · **Modal preview:** [openline-comp.pplx.app/modal-preview.html](https://openline-comp.pplx.app/modal-preview.html)
+Openline's searchable reference for eSIM-capable device families, model codes, and regional variants. Maintained by [Openline](https://openline.com) in [askopenline/openline-check](https://github.com/askopenline/openline-check).
 
-A fast, offline-first web app that answers one question: **does your device support eSIM?**
+## Scope
 
-Type any brand, model name, or model code — even with typos — and the app tells you in a second whether Openline can activate on it, with clear regional caveats where they apply.
+This static application helps customers find a device and read its recorded compatibility notes. It provides search and filtering, a standalone interface, and an embeddable modal preview without a backend or build step.
 
-## What's inside
+The catalogue contains generated and curated entries, including records marked as unverified. A matching row is not a guarantee that a particular handset, firmware version, carrier-locked device, or Openline plan will work; confirm the exact model and regional variant before purchase.
 
-- **9,496 devices** across 174 brands, from 1983 feature phones to 2026 flagships
-- **Two arcs**:
-  - Arc 1 — exhaustive eSIM-compatible catalog (iPhone, Samsung Galaxy, Pixel, Watch, iPad, hotspots, wearables, vehicle telematics) with regional SKU codes
-  - Arc 2 — historical archive of pre-eSIM devices (Nokia, Motorola, Sony Ericsson, Siemens, BlackBerry, CDMA-only, Windows Phone, KaiOS, feature phones)
-- **Typo-tolerant fuzzy search** — Damerau-Levenshtein matching, 60+ brand aliases, smooshed-token splitting (`iphone15pro` → `iphone 15 pro`), plus/`+` qualifier boost
-- **Interactive warning pills** on every row with regional caveats or data-quality issues (US: eSIM only, JP domestic band lock, CDMA legacy, Windows Phone, Unverified variant, Cross-brand model code, Model code unverified, Ambiguous name, and many more)
-- **Fully responsive**, tested down to 320×568 mobile with proper 44px tap targets and bottom-sheet modal treatment
-- **Zero dependencies** — vanilla HTML / CSS / JS, ~30KB gzipped
+## Repository guide
 
-## Files
+| File | Purpose |
+| --- | --- |
+| [`devices.js`](devices.js) | Device records and compatibility notes |
+| [`app.js`](app.js) | Search, aliases, ranking, filters, and interface behavior |
+| [`index.html`](index.html) | Standalone application |
+| [`modal-preview.html`](modal-preview.html) | Embedding reference |
+| [`style.css`](style.css) | Application-specific presentation |
+| [`scripts/`](scripts/) | Historical catalogue-generation and search-audit tools |
+| [`LICENSE`](LICENSE) | MIT license and original copyright notice |
 
-```
-index.html              Main app
-modal-preview.html      Standalone modal-view preview (for embedding in openline.com)
-style.css               ~700-line design system, Openline orange palette
-app.js                  Search pipeline, filters, stats, popovers, empty state
-devices.js              Generated device database (9,496 rows)
-scripts/                Python generators for the device DB and audit tooling
-  build_devices*.py     Modular DB builders (Apple, Samsung, Pixel, archive brands, mass, combinatorial)
-  audit_add_warnings.py Post-processes devices.js to flag suspicious entries
-  audit_search.py       Python port of the JS search for offline audit / QA
+## Run locally
+
+```sh
+git clone https://github.com/askopenline/openline-check.git
+cd openline-check
+python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-## Running locally
+Open [the local application](http://127.0.0.1:8000) or [the modal preview](http://127.0.0.1:8000/modal-preview.html). No package installation is needed to serve the existing site.
 
-No build step. Serve the folder with any static server:
+## Maintain the catalogue
 
-```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
-```
+Each record includes `brand`, `name`, `model`, `year`, `esim`, and an optional `note`. Treat the manufacturer model code and regional restrictions as material data, not interchangeable labels.
 
-## Regenerating the device database
+- **Evidence:** Prefer manufacturer or carrier documentation for the exact variant and keep the source and review date in the change record.
+- **Uncertainty:** Retain unverified labels and Wi-Fi-only, regional, firmware, and carrier-lock caveats.
+- **Duplicates:** Check family-level entries and model-code variants before adding another row.
+- **Search QA:** Exercise exact models, model codes, common spelling errors, brand filters, negative results, and the mobile layout.
+- **Generator safety:** Some scripts contain historical absolute workstation paths or synthesize model variants. Inspect and adapt them before use; do not regenerate and publish a catalogue without reviewing the resulting records.
 
-```bash
-cd scripts
-python3 build_devices.py                 # produces base devices.js
-python3 build_devices_expansion.py
-python3 build_devices_wave2.py
-python3 build_devices_arc1_compatible.py
-python3 build_devices_arc2_archive.py
-python3 build_devices_arc2_mass.py
-python3 build_devices_arc2_mass2.py
-python3 build_devices_arc2_combinatorial.py
-python3 audit_add_warnings.py            # flags suspicious entries with warning notes
-```
+Catalogue size is not the number of independently tested devices. Documentation cleanup does not validate every compatibility claim in the dataset.
 
-## Data sources
+## Integration and deployment
 
-Compatibility rules synthesized from Apple, Vodafone UK, Klook, Cybernews, esim-now, mysimguide (accurate as of Aug 2026). Model-code mappings from manufacturer support pages, FCC ID databases, and public spec sheets. Regional caveats sourced from carrier documentation. **Warning tags** are heuristic and reflect data-quality flags — always verify the exact model on the manufacturer's site before purchase.
+The application can be served by a static web host, with `index.html` as its entry point. Review shared stylesheet URLs and embedding behavior before integrating it into another Openline surface.
 
-## License
+The existing preview is recorded at [openline-comp.pplx.app](https://openline-comp.pplx.app). This company repository copy does not move that hosting, update a production embed, or certify current service availability.
 
-MIT — see `LICENSE`.
+## Ownership and license
 
-## Credits
+This is an Openline company project distributed under the [MIT license](LICENSE). The original copyright notice and historical contributor attribution remain intact; company maintenance does not remove those notices or grant rights to third-party trademarks.
 
-Built for [Openline](https://openline.com) by Paul Fleury.
+Report a catalogue or interface problem through [repository issues](https://github.com/askopenline/openline-check/issues). Include the exact model code, region, supporting evidence, and the observed problem, without personal device identifiers.
