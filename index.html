@@ -4,16 +4,155 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#FFFFFF" />
-    <title>Openline · Does my device support eSIM?</title>
-    <meta
-      name="description"
-      content="Check whether your device is eSIM-compatible. A quick lookup across 9,000+ phones, tablets, watches, hotspots, and more — powered by Openline."
-    />
-    <link rel="icon" href="https://raw.githubusercontent.com/paulfxyz/openline-brand-assets/main/openline-mark-512.png" />
+    <title>eSIM compatibility check: does my phone support eSIM? · Openline</title>
+    <meta name="description" content="Free eSIM checker for 9,496 phones, tablets, smartwatches and hotspots from 173 brands. Search any model or code and see instantly if it supports eSIM." />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="author" content="Openline" />
+    <meta name="application-name" content="Openline Check" />
+    <meta name="apple-mobile-web-app-title" content="Openline Check" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="canonical" href="https://check.openline.com/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Openline" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://check.openline.com/" />
+    <meta property="og:title" content="Does your device support eSIM? · Openline" />
+    <meta property="og:description" content="Search 9,496 phones, tablets, watches and hotspots by name or model code and get an instant eSIM answer, with regional caveats." />
+    <meta property="og:image" content="https://check.openline.com/og.png" />
+    <meta property="og:image:secure_url" content="https://check.openline.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Openline eSIM compatibility check: search any device and see if it supports eSIM" />
+
+    <!-- X / Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@askopenline" />
+    <meta name="twitter:creator" content="@askopenline" />
+    <meta name="twitter:title" content="Does your device support eSIM? · Openline" />
+    <meta name="twitter:description" content="Search 9,496 phones, tablets, watches and hotspots by name or model code and get an instant eSIM answer, with regional caveats." />
+    <meta name="twitter:image" content="https://check.openline.com/og.png" />
+    <meta name="twitter:image:alt" content="Openline eSIM compatibility check: search any device and see if it supports eSIM" />
+
+    <!-- Icons & app -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://openline.com/#org",
+      "name": "Openline",
+      "url": "https://openline.com/",
+      "logo": "https://check.openline.com/icons/icon-512.png",
+      "email": "ask@openline.com",
+      "sameAs": [
+        "https://x.com/askopenline",
+        "https://instagram.com/askopenline",
+        "https://facebook.com/askopenline",
+        "https://youtube.com/@askopenline",
+        "https://github.com/askopenline"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://check.openline.com/#website",
+      "url": "https://check.openline.com/",
+      "name": "Openline eSIM compatibility check",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://openline.com/#org"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://check.openline.com/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://check.openline.com/#app",
+      "name": "Openline eSIM compatibility check",
+      "url": "https://check.openline.com/",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "description": "Free eSIM checker for 9,496 phones, tablets, smartwatches and hotspots from 173 brands. Search any model or code and see instantly if it supports eSIM.",
+      "image": "https://check.openline.com/og.png",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      },
+      "publisher": {
+        "@id": "https://openline.com/#org"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://check.openline.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I check if my phone supports eSIM?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Search your brand and model above, or the model code printed in your phone’s settings. You can also dial *#06#: if an EID line appears, the device has eSIM hardware."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is an EID?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The EID (eUICC identifier) is a 32-digit number that identifies the eSIM chip inside your device. Only devices with eSIM hardware have one."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why can the same model differ by region?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Manufacturers ship regional versions. Most iPhones sold in mainland China, Hong Kong and Macao use two physical SIMs instead of eSIM, while US iPhone 14 and later are eSIM-only. Check the exact model code."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does my phone need to be unlocked?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. A carrier-locked phone may refuse eSIM profiles from other providers even if it has eSIM hardware. Ask your carrier to unlock it before installing a new eSIM."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I install an Openline eSIM?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "If your device is compatible and unlocked, buy a plan at openline.com and scan the QR code under Settings › Cellular (iPhone) or Settings › Connections › SIM manager (most Android phones)."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
-    <link rel="stylesheet" href="./style.css?v=20" />
+    <link rel="stylesheet" href="./style.css?v=21" />
     <script>
       // Enable embedded/modal styling when loaded inside an iframe OR ?embed=1
       (function () {
@@ -32,8 +171,8 @@
     <header class="topbar">
       <a class="brand" href="/" aria-label="Openline — Check if your device is compatible">
         <img
-          src="https://raw.githubusercontent.com/paulfxyz/openline-brand-assets/main/logo/png/openline-logo-color.png"
-          alt=""
+          src="/icons/mark-56.png"
+          alt="Openline"
           width="28"
           height="28"
         />
@@ -165,10 +304,35 @@
           your device has eSIM hardware.
         </p>
       </section>
+
+      <section class="faq" id="faq" aria-labelledby="faq-title">
+        <h2 class="rules-title" id="faq-title">eSIM questions, answered</h2>
+        <details class="faq-item" open>
+          <summary>How do I check if my phone supports eSIM?</summary>
+          <p>Search your brand and model above, or the model code printed in your phone’s settings. You can also dial <code>*#06#</code>: if an EID line appears, the device has eSIM hardware.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What is an EID?</summary>
+          <p>The EID (eUICC identifier) is a 32-digit number that identifies the eSIM chip inside your device. Only devices with eSIM hardware have one.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Why can the same model differ by region?</summary>
+          <p>Manufacturers ship regional versions. Most iPhones sold in mainland China, Hong Kong and Macao use two physical SIMs instead of eSIM, while US iPhone 14 and later are eSIM-only. Check the exact model code.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Does my phone need to be unlocked?</summary>
+          <p>Yes. A carrier-locked phone may refuse eSIM profiles from other providers even if it has eSIM hardware. Ask your carrier to unlock it before installing a new eSIM.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How do I install an Openline eSIM?</summary>
+          <p>If your device is compatible and unlocked, buy a plan at <a href="https://openline.com">openline.com</a> and scan the QR code under Settings › Cellular (iPhone) or Settings › Connections › SIM manager (most Android phones).</p>
+        </details>
+      </section>
     </main>
 
     <footer class="footer">
-      <span class="footer-legal">© Openline &middot;
+      <span class="footer-legal">© <a href="https://openline.com">Openline</a> &middot;
+        <a href="mailto:ask@openline.com">ask@openline.com</a> &middot;
         <a href="https://openline.com/privacy" target="_blank" rel="noopener">Privacy</a> &middot;
         <a href="https://openline.com/terms" target="_blank" rel="noopener">Terms</a>
       </span>
@@ -189,7 +353,7 @@
       <span class="footer-count"><b id="footer-total">0</b> devices indexed</span>
     </footer>
 
-    <script src="./devices.js?v=20"></script>
-    <script src="./app.js?v=20"></script>
+    <script src="./devices.js?v=21"></script>
+    <script src="./app.js?v=21"></script>
   </body>
 </html>

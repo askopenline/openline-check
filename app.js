@@ -960,5 +960,32 @@
   $statNo.textContent = COMPAT_COUNTS.no.toLocaleString();
   $statBrands.textContent = BRANDS.length.toLocaleString();
 
+  // ---------- Shareable search links (?q=pixel+9) ----------
+  const BASE_TITLE = document.title;
+  try {
+    const initial = new URLSearchParams(location.search).get("q");
+    if (initial) $q.value = initial.slice(0, 80);
+  } catch (e) {}
+  let urlTimer = null;
+  function syncUrl() {
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(() => {
+      try {
+        const q = $q.value.trim();
+        const params = new URLSearchParams(location.search);
+        if (q) params.set("q", q); else params.delete("q");
+        const qs = params.toString();
+        history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+        document.title = q ? q + " eSIM compatibility · Openline" : BASE_TITLE;
+      } catch (e) {}
+    }, 350);
+  }
+  $q.addEventListener("input", syncUrl);
+  $q.addEventListener("search", syncUrl);
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#clear, button[data-action='clear-search']")) syncUrl();
+  });
+
   render();
+  if ($q.value) syncUrl();
 })();

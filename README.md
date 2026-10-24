@@ -17,7 +17,7 @@
 
 **A fast, browser-based explorer for eSIM support across device families and regional variants.**
 
-[Company website](https://openline.com) · [Project overview](https://openline-comp.pplx.app) · [Release history](https://github.com/askopenline/openline-check/releases) · [Contribution guide](.github/OPENLINE-CONTRIBUTING.md)
+[Company website](https://openline.com) · [Live explorer](https://check.openline.com) · [Modal view](https://check.openline.com/modal-preview.html) · [Release history](https://github.com/askopenline/openline-check/releases) · [Contribution guide](.github/OPENLINE-CONTRIBUTING.md)
 
 </div>
 
@@ -26,10 +26,13 @@
 A fast way to explore eSIM support across device families, model codes, and regional variants. Openline's compatibility interface combines a searchable catalogue with readable notes, brand filters, and an embeddable presentation for use inside a wider customer journey.
 
 <p align="center">
-  <a href="https://openline-comp.pplx.app"><strong>Open the compatibility explorer</strong></a> ·
+  <a href="https://check.openline.com"><strong>Open the compatibility explorer</strong></a> ·
+  <a href="https://check.openline.com/modal-preview.html">Modal view</a> ·
   <a href="#what-it-does">Capabilities</a> ·
   <a href="#quick-start">Run locally</a> ·
   <a href="#catalogue-maintenance">Maintain the data</a> ·
+  <a href="#search-and-sharing">SEO</a> ·
+  <a href="#hosting-and-deployment">Hosting</a> ·
   <a href="https://github.com/askopenline/openline-check/releases">Releases</a>
 </p>
 
@@ -101,6 +104,10 @@ Open [the local explorer](http://127.0.0.1:8000) or [the modal reference](http:/
 | [`index.html`](index.html) | Standalone application |
 | [`modal-preview.html`](modal-preview.html) | Embedding reference |
 | [`style.css`](style.css) | Application-specific presentation |
+| [`og.png`](og.png) | 1200×630 social card used by Open Graph and X |
+| [`icons/`](icons/), [`favicon.ico`](favicon.ico), [`site.webmanifest`](site.webmanifest) | Favicons, Apple touch icon and installable-app icons |
+| [`robots.txt`](robots.txt), [`sitemap.xml`](sitemap.xml) | Crawler rules and sitemap for check.openline.com |
+| [`404.html`](404.html) | Branded not-found page |
 | [`scripts/`](scripts/) | Catalogue-generation and search-audit tooling |
 | [`LICENSE`](LICENSE) | MIT terms and original copyright notice |
 
@@ -123,11 +130,39 @@ Some historical scripts contain workstation-specific paths or generate model var
 
 ---
 
+## Search and sharing
+
+[check.openline.com](https://check.openline.com) is set up to be found and shared:
+
+- Title, description, canonical URL and robots directives on the main page; the modal reference is `noindex`.
+- Open Graph and X cards with a dedicated [1200×630 card](og.png) and `@askopenline` attribution.
+- JSON-LD for Organization, WebSite (with a search action), WebApplication and FAQPage, matching the visible FAQ.
+- Shareable searches: [check.openline.com/?q=pixel+9](https://check.openline.com/?q=pixel+9) opens with results, and the address bar follows the search.
+- Self-hosted favicons, Apple touch icon, web manifest, `robots.txt` and `sitemap.xml`.
+
+---
+
+## Hosting and deployment
+
+The production explorer is served at **[check.openline.com](https://check.openline.com)**, with the embeddable reference at [check.openline.com/modal-preview.html](https://check.openline.com/modal-preview.html).
+
+| Layer | Setup |
+| --- | --- |
+| Host | Fly.io app `openline-check`, one always-on machine in Paris (`cdg`) |
+| Server | Caddy serving the static files with gzip/zstd, no-cache HTML and short-lived JS/CSS caching |
+| Source | The machine downloads a pinned commit of this repository at boot; `scripts/` is not served |
+| Domain | `check.openline.com` on Cloudflare DNS (DNS only), TLS issued by Fly via Let's Encrypt |
+| Fallback | [openline-check.fly.dev](https://openline-check.fly.dev) |
+
+GitHub is the source of truth. Pushing to `main` does not change production by itself: a release is published by pointing the Fly machine at the new commit and restarting it, then checking the live pages.
+
+---
+
 ## Integration notes
 
 Use [`modal-preview.html`](modal-preview.html) as the starting reference for embedding, and review shared stylesheet URLs when integrating with another Openline surface. Test focus management, scrolling, container dimensions, filter interactions, and how the modal returns the customer to the surrounding journey.
 
-When updating a shared asset, verify the company-hosted bytes and the consuming page rather than assuming a cache refresh. A repository release, a hosting deployment, and an update to an existing embed are separate actions.
+When updating a shared asset, verify the company-hosted bytes and the consuming page rather than assuming a cache refresh. A repository release, a hosting deployment on [check.openline.com](https://check.openline.com), and an update to an existing embed on [openline.com](https://openline.com) are separate actions.
 
 ---
 
@@ -157,6 +192,6 @@ A familiar device-family name is not enough to settle regional, firmware, or loc
 
 ## Maintenance, releases, and license
 
-See the [company changelog](OPENLINE-CHANGELOG.md), [releases](https://github.com/askopenline/openline-check/releases), and [contribution guide](.github/OPENLINE-CONTRIBUTING.md) for the maintained company edition. Use the [security guide](.github/OPENLINE-SECURITY.md) for sensitive reports.
+See the [company changelog](OPENLINE-CHANGELOG.md), [releases](https://github.com/askopenline/openline-check/releases), and [contribution guide](.github/OPENLINE-CONTRIBUTING.md) for the maintained company edition. Use the [security guide](.github/OPENLINE-SECURITY.md) for sensitive reports. Customer questions go to [ask@openline.com](mailto:ask@openline.com) or [@askopenline](https://x.com/askopenline).
 
 Openline maintains this project under the existing [MIT license](LICENSE). Original attribution remains intact, and third-party device names and marks retain their respective rights.

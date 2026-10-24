@@ -2,6 +2,18 @@
 
 This changelog records the Openline-maintained company edition. Original Git history, upstream notices, and earlier source release tags are preserved rather than rewritten.
 
+## Production hosting: 24 October 2026
+
+Tag: `company-2026.10.24`. The explorer moves from its preview host to the company domain.
+
+- Live at [check.openline.com](https://check.openline.com), with the modal reference at [check.openline.com/modal-preview.html](https://check.openline.com/modal-preview.html).
+- Hosted on Fly.io (`openline-check`, Paris) behind Cloudflare DNS, serving a pinned commit of this repository.
+- Repository homepage, README links and page metadata (canonical, Open Graph, `@askopenline` card) now point to the company domain.
+- Brand assets load from [askopenline/openline-brand-assets](https://github.com/askopenline/openline-brand-assets).
+- Search and sharing: new title and description, Open Graph and X cards with a dedicated 1200×630 image, JSON-LD (Organization, WebSite, WebApplication, FAQPage), robots.txt, sitemap.xml, web manifest and self-hosted icons.
+- New visible FAQ section, a branded 404 page, and shareable `?q=` search links.
+- No catalogue changes in this edition.
+
 ## Company edition: 17 October 2026
 
 Tag: `company-2026.10.17`. This edition establishes the official company presentation and repository documentation without claiming a new upstream product version.

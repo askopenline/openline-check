@@ -4,10 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Openline · Modal preview</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="https://check.openline.com/modal-preview.html" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
-    <link rel="stylesheet" href="./style.css?v=20" />
+    <link rel="stylesheet" href="./style.css?v=21" />
     <style>
       /* ============ Fake Openline landing (stage) ============ */
       html { data-embed: unset; }
@@ -142,7 +145,7 @@
     <!-- Fake Openline.com landing behind the modal -->
     <div class="stage-topbar" aria-hidden="true">
       <a class="brand" href="/">
-        <img src="https://raw.githubusercontent.com/paulfxyz/openline-brand-assets/main/logo/png/openline-logo-color.png" alt="" width="28" height="28" />
+        <img src="/icons/mark-56.png" alt="" width="28" height="28" />
         <span class="brand-word">Openline</span>
       </a>
       <nav>
@@ -174,7 +177,7 @@
         <!-- App markup, identical to index.html -->
         <header class="topbar">
           <a class="brand" href="./index.html" aria-label="Openline — Check if your device is compatible">
-            <img src="https://raw.githubusercontent.com/paulfxyz/openline-brand-assets/main/logo/png/openline-logo-color.png" alt="" width="28" height="28" />
+            <img src="/icons/mark-56.png" alt="" width="28" height="28" />
             <span class="brand-sub">Check if your device is compatible</span>
           </a>
         </header>
@@ -250,7 +253,8 @@
         </main>
 
         <footer class="footer">
-          <span class="footer-legal">© Openline &middot;
+          <span class="footer-legal">© <a href="https://openline.com">Openline</a> &middot;
+            <a href="mailto:ask@openline.com">ask@openline.com</a> &middot;
             <a href="https://openline.com/privacy" target="_blank" rel="noopener">Privacy</a> &middot;
             <a href="https://openline.com/terms" target="_blank" rel="noopener">Terms</a>
           </span>
@@ -274,7 +278,7 @@
       </div>
     </div>
 
-    <script src="./devices.js?v=20"></script>
-    <script src="./app.js?v=20"></script>
+    <script src="./devices.js?v=21"></script>
+    <script src="./app.js?v=21"></script>
   </body>
 </html>

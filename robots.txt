@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /modal-preview.html
+
+Sitemap: https://check.openline.com/sitemap.xml
