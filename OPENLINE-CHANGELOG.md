@@ -2,6 +2,18 @@
 
 This changelog records the Openline-maintained company edition. Original Git history, upstream notices, and earlier source release tags are preserved rather than rewritten.
 
+## Catalogue refresh: 24 October 2026
+
+Tag: `company-2026.10.24b`. A data audit and update of the latest devices, live on [check.openline.com](https://check.openline.com).
+
+- **9,906 devices** (+410) from 173 brands, **1,158 eSIM-compatible** (+112).
+- **Apple rebuilt from Apple's own model tables**: iPhone 14 through iPhone 18 Pro / 18 Pro Max, iPhone 17e, iPhone Air and iPhone Duo, each with its US, Canada/Japan/Gulf, global and China model numbers; iPad Pro (M5), iPad Air (M3, M4) and iPad (A16) cellular models; Apple Watch Series 11, Series 12, SE 3, Ultra 3 and Ultra 4.
+- **China mainland, Hong Kong and Macao iPhones** that use two nano-SIMs (iPhone 14–16 families, iPhone 17 / 17 Pro / 17 Pro Max China) are now marked not compatible. China models that do support eSIM (iPhone Air, 17e, 18 Pro, Duo) carry a local-rules caveat.
+- **New devices** from Samsung (Galaxy Z Fold8 Ultra, Z Fold8, Z Flip8, Z TriFold, Tab S12, Watch9, Watch Ultra2, A57, A37…), Google (Pixel 11 series, Pixel 11 Pro Fold, Pixel Watch 5), OnePlus 15, Nothing Phone (3)/(4a) Pro, Xiaomi 17T, vivo X500, Motorola, Oppo, Honor, Huawei, realme, ZTE/nubia, Sony and more, checked against GSMArena spec sheets.
+- **Corrections**: wrong model codes on Galaxy S26/S26+/S26 FE, Z Flip7, the Pixel 10 family and Pixel 9a, OnePlus 13R/13s/13T/Nord 5 and others; Huawei Mate 80 / 80 Pro / 80 Pro Max no longer marked eSIM; rumour-era entries (iPhone 17 Air, iPhone SE 4th gen) removed; stray backslashes in iPad names fixed; duplicated brand names (“Apple Apple Watch”) removed.
+- **New warnings**: carrier watch plan (cellular smartwatches), GPS-only watches, China dual nano-SIM, China local eSIM rules, no SIM tray.
+- **Search**: “oneplus” and “one plus” no longer split into “one” + “plus”; misspelled brands such as “motorolla” now match; the list opens on the newest devices.
+
 ## Production hosting: 24 October 2026
 
 Tag: `company-2026.10.24`. The explorer moves from its preview host to the company domain.

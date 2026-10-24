@@ -128,6 +128,15 @@
   function splitSmooshed(t) {
     if (t.length < 5) return [t];
     if (t.includes(" ")) return [t];
+    // A whole known word ('oneplus', 'zenfone', 'thinkphone') must never be split.
+    if (KNOWN_PREFIXES.includes(t.toLowerCase())) return [t];
+    // A misspelled known word ('motorolla', 'samsnug') must reach fuzzy matching whole.
+    if (!/\d/.test(t)) {
+      const lt = t.toLowerCase();
+      for (const p of KNOWN_PREFIXES) {
+        if (p.length >= 6 && editDistance(lt, p, 2) <= 2) return [t];
+      }
+    }
     // Pass 1: greedily extract known prefixes from the front and body of the token.
     // Repeat until no more prefixes are found or the token is exhausted.
     let remaining = t.toLowerCase();
@@ -336,12 +345,39 @@
     /Model code unverified/i,
     /Ambiguous name/i,
     /CN firmware/i,
+    /no SIM tray/i,
+    /eSIM only in US\/JP\/CA\/Gulf/i,
+    /dual nano-SIM/i,
+    /CN: local eSIM rules/i,
+    /Carrier watch plan/i,
+    /GPS only/i,
   ];
   function isRegionalNote(note) {
     return REGIONAL_PATTERNS.some((re) => re.test(note));
   }
   function regionalExplanation(note) {
     // Order matters — most specific first.
+    if (/Carrier watch plan/i.test(note)) {
+      return "Cellular smartwatches get their eSIM through a carrier watch plan, set up from the paired phone’s companion app (Apple Watch app, Galaxy Wearable, Pixel Watch app). Phone or travel eSIM QR codes can’t be installed on the watch directly, so check that your carrier offers a plan for this watch.";
+    }
+    if (/GPS only/i.test(note)) {
+      return "This is the GPS-only version. It has no cellular radio, so it can’t use any eSIM. The GPS + Cellular version of the same watch has a different model number.";
+    }
+    if (/CN\/HK\/MO: dual nano-SIM/i.test(note)) {
+      return "iPhones sold in mainland China, Hong Kong and Macao for this generation have two physical nano-SIM slots and no eSIM. Openline can’t install on these units. Check the model number under Settings › General › About.";
+    }
+    if (/CN: dual nano-SIM/i.test(note)) {
+      return "The mainland China version of this phone uses two physical nano-SIM cards and has no eSIM. Models sold everywhere else support eSIM. Check the model number under Settings › General › About.";
+    }
+    if (/CN: local eSIM rules/i.test(note)) {
+      return "The mainland China version supports eSIM, but Chinese carriers only activate eSIM in their stores with ID checks, and overseas eSIM profiles can’t be installed while you’re in mainland China. Outside China, travel eSIMs such as Openline install normally.";
+    }
+    if (/eSIM only in US\/JP\/CA\/Gulf/i.test(note)) {
+      return "Units sold in the United States, Canada, Japan, Mexico and the Gulf states have no SIM tray and work with eSIM only. Elsewhere the phone also has a nano-SIM tray, and mainland China units may lack eSIM. Openline works on every eSIM-capable version.";
+    }
+    if (/no SIM tray/i.test(note)) {
+      return "This version has no physical SIM tray: every line, including Openline, is added as an eSIM. You can store several eSIMs and switch between them in Settings.";
+    }
     if (/iDEN/i.test(note)) {
       return "This device runs on Motorola’s iDEN network (Nextel / Boost push-to-talk), which was fully decommissioned by Sprint in June 2013. It cannot connect to any modern cellular network — eSIM or otherwise. Museum/collector item only.";
     }
@@ -549,7 +585,7 @@
   // ---------- Render ----------
   function render() {
     const rawQuery = $q.value.trim();
-    const query = normalize(rawQuery);
+    const query = normalize(rawQuery).replace(/\bone plus\b/g, "oneplus");
     const rawTokens = query.split(" ").filter(Boolean);
     const tokens = expandTokens(rawTokens);
     $clear.hidden = rawQuery.length === 0;

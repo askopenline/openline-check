@@ -9,7 +9,7 @@ import re
 import unicodedata
 
 # Load devices from generated JS
-raw = open("/home/user/workspace/openline-esim-check/devices.js").read()
+raw = open("devices.js").read()
 # Pull each { brand: "...", name: "...", model: "...", year: N, esim: true|false, note?: "..." }
 DEVICES = []
 for m in re.finditer(r"\{\s*brand:\s*\"([^\"]*)\",\s*name:\s*\"([^\"]*)\",\s*model:\s*\"([^\"]*)\",\s*year:\s*(\d+),\s*esim:\s*(true|false)(?:,\s*note:\s*\"([^\"]*)\")?\s*\}", raw):
@@ -119,6 +119,11 @@ KNOWN_PREFIXES = sorted([
 def split_smooshed(t):
     if len(t) < 5: return [t]
     if " " in t: return [t]
+    if t.lower() in KNOWN_PREFIXES: return [t]  # never split a whole known word (oneplus)
+    if not re.search(r'\d', t):
+        lt = t.lower()
+        for p in KNOWN_PREFIXES:
+            if len(p) >= 6 and edit_distance(lt, p, 2) <= 2: return [t]
     remaining = t.lower()
     extracted = []
     guard = 0
@@ -238,7 +243,7 @@ def fuzzy_match(needle, hay):
     return False
 
 def search(raw_query):
-    tokens = expand_tokens(normalize(raw_query).split())
+    tokens = expand_tokens(re.sub(r'\bone plus\b', 'oneplus', normalize(raw_query)).split())
     matches = INDEX
     used_fuzzy = False
     if tokens:
