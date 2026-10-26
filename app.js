@@ -292,14 +292,36 @@
     );
   }
   function highlight(text, tokens) {
-    let out = escapeHtml(text);
-    if (!tokens.length) return out;
-    const sorted = tokens.slice().sort((a, b) => b.length - a.length).filter((t) => t.length >= 2);
-    for (const t of sorted) {
-      const re = new RegExp("(" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi");
-      out = out.replace(re, "<mark>$1</mark>");
+    const raw = String(text);
+    const list = (tokens || []).filter((t) => t && t.length >= 2);
+    if (!list.length) return escapeHtml(raw);
+    // Collect match ranges on the raw text, then merge them, so markup is
+    // never matched by a later token and entities are never split.
+    const lower = raw.toLowerCase();
+    const ranges = [];
+    for (const t of list) {
+      const n = t.toLowerCase();
+      let i = lower.indexOf(n);
+      while (i !== -1) {
+        ranges.push([i, i + n.length]);
+        i = lower.indexOf(n, i + 1);
+      }
     }
-    return out;
+    if (!ranges.length) return escapeHtml(raw);
+    ranges.sort((a, b) => a[0] - b[0] || b[1] - a[1]);
+    const merged = [ranges[0].slice()];
+    for (const r of ranges.slice(1)) {
+      const last = merged[merged.length - 1];
+      if (r[0] <= last[1]) last[1] = Math.max(last[1], r[1]);
+      else merged.push(r.slice());
+    }
+    let out = "";
+    let pos = 0;
+    for (const [a, b] of merged) {
+      out += escapeHtml(raw.slice(pos, a)) + "<mark>" + escapeHtml(raw.slice(a, b)) + "</mark>";
+      pos = b;
+    }
+    return out + escapeHtml(raw.slice(pos));
   }
 
   // Detect which notes are regional caveats (open in a popover) vs plain info.

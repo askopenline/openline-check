@@ -2,6 +2,12 @@
 
 This changelog records the Openline-maintained company edition. Original Git history, upstream notices, and earlier source release tags are preserved rather than rewritten.
 
+## Search highlight fix: 26 October 2026
+
+Tag: `company-2026.10.26`. Live on [check.openline.com](https://check.openline.com).
+
+- Partial queries such as “iphone ma” no longer show literal `<mark>` tags in results. Highlighting now merges all match ranges on the raw text before escaping, so a short term can never match inside markup inserted for another term.
+
 ## Catalogue refresh: 24 October 2026
 
 Tag: `company-2026.10.24b`. A data audit and update of the latest devices, live on [check.openline.com](https://check.openline.com).
