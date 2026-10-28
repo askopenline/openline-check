@@ -2,6 +2,10 @@
 
 This changelog records the Openline-maintained company edition. Original Git history, upstream notices, and earlier source release tags are preserved rather than rewritten.
 
+## French punctuation fix: 28 October 2026
+
+- French now uses non-breaking spaces before ? ! : ; and inside « », so a question mark can no longer wrap onto its own line (e.g. the page title). Applied in `scripts/build_i18n.py` for every French string. Cache version 25.
+
 ## 33 languages: 28 October 2026
 
 Tag: `company-2026.10.28`. Live on [check.openline.com](https://check.openline.com).

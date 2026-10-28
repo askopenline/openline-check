@@ -54,6 +54,15 @@ def url_for(loc):
     return SITE + "/" + (loc["path"] + "/" if loc["path"] else "")
 
 
+def french_spacing(v):
+    """French typography: keep ? ! : ; » glued to the previous word and « to the next."""
+    if isinstance(v, dict):
+        return {k: french_spacing(x) for k, x in v.items()}
+    v = re.sub(r"[ \u00a0\u202f]+([?!:;»])", "\u00a0\\1", v)
+    v = re.sub(r"(«)[ \u00a0\u202f]+", "\\1\u00a0", v)
+    return v
+
+
 def plural_other(v):
     return v.get("other", "") if isinstance(v, dict) else v
 
@@ -78,6 +87,8 @@ def build(version):
             if miss:
                 missing[code] = miss
             d = {k: tr.get(k, en[k]) for k in en}
+            if code == "fr":
+                d = {k: french_spacing(v) for k, v in d.items()}
         dicts[code] = d
     if missing:
         for c, m in missing.items():
