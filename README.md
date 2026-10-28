@@ -31,6 +31,7 @@ A fast way to explore eSIM support across device families, model codes, and regi
   <a href="#what-it-does">Capabilities</a> ·
   <a href="#quick-start">Run locally</a> ·
   <a href="#catalogue-maintenance">Maintain the data</a> ·
+  <a href="#languages">Languages</a> ·
   <a href="#search-and-sharing">SEO</a> ·
   <a href="#hosting-and-deployment">Hosting</a> ·
   <a href="https://github.com/askopenline/openline-check/releases">Releases</a>
@@ -50,6 +51,7 @@ The application runs in the browser and does not require a backend or applicatio
 | Typo-tolerant matching | Recover useful results from common spelling and naming variations |
 | Brand and support filters | Narrow a large catalogue without scrolling through every entry |
 | Variant notes | Keep regional, firmware, Wi-Fi-only, and carrier-lock qualifications visible |
+| 33 languages | The same languages as [openline.com](https://openline.com), with a flag switcher in the top bar |
 | Standalone view | Offer a focused compatibility destination |
 | Modal reference | Embed the lookup inside another Openline interface |
 | Static delivery | Serve the application as HTML, CSS, JavaScript, and data |
@@ -101,13 +103,17 @@ Open [the local explorer](http://127.0.0.1:8000) or [the modal reference](http:/
 | --- | --- |
 | [`devices.js`](devices.js) | Device catalogue and compatibility notes |
 | [`app.js`](app.js) | Search, ranking, aliases, filters, and interface state |
-| [`index.html`](index.html) | Standalone application |
+| [`index.html`](index.html) | Standalone application (English, generated) |
+| `fr/`, `de/`, `latam/`, `br/`, `tw/` … | Generated localized pages, one folder per language |
+| [`i18n/`](i18n/) | Generated runtime dictionaries loaded by `app.js` |
+| [`flags/`](flags/) | Flag images for the language switcher ([flag-icons](https://github.com/lipis/flag-icons), MIT) |
+| [`scripts/i18n/`](scripts/i18n/) | English source strings, page template, locale list and reviewed translations |
 | [`modal-preview.html`](modal-preview.html) | Embedding reference |
 | [`style.css`](style.css) | Application-specific presentation |
 | [`og.png`](og.png) | 1200×630 social card used by Open Graph and X |
 | [`icons/`](icons/), [`favicon.ico`](favicon.ico), [`site.webmanifest`](site.webmanifest) | Favicons, Apple touch icon and installable-app icons |
 | [`robots.txt`](robots.txt), [`sitemap.xml`](sitemap.xml) | Crawler rules and sitemap for check.openline.com |
-| [`404.html`](404.html) | Branded not-found page |
+| [`404.html`](404.html) | Branded not-found page in every language (generated) |
 | [`scripts/`](scripts/) | Catalogue-generation and search-audit tooling |
 | [`LICENSE`](LICENSE) | MIT terms and original copyright notice |
 
@@ -130,14 +136,40 @@ Some historical scripts contain workstation-specific paths or generate model var
 
 ---
 
+## Languages
+
+The checker speaks the same 33 languages as [openline.com](https://openline.com), at the same paths:
+
+English (`/`) · [Español](https://check.openline.com/es/) · [Français](https://check.openline.com/fr/) · [Deutsch](https://check.openline.com/de/) · [Italiano](https://check.openline.com/it/) · [Português](https://check.openline.com/pt/) · [日本語](https://check.openline.com/ja/) · [中文（简体）](https://check.openline.com/zh/) · [Türkçe](https://check.openline.com/tr/) · [Русский](https://check.openline.com/ru/) · [中文（繁體）](https://check.openline.com/tw/) · [Español (Latinoamérica)](https://check.openline.com/latam/) · [Português (Brasil)](https://check.openline.com/br/) · [한국어](https://check.openline.com/ko/) · [हिन्दी](https://check.openline.com/hi/) · [বাংলা](https://check.openline.com/bn/) · [Bahasa Indonesia](https://check.openline.com/id/) · [Bahasa Melayu](https://check.openline.com/ms/) · [Tiếng Việt](https://check.openline.com/vi/) · [ไทย](https://check.openline.com/th/) · [Filipino](https://check.openline.com/tl/) · [Polski](https://check.openline.com/pl/) · [Nederlands](https://check.openline.com/nl/) · [Svenska](https://check.openline.com/sv/) · [Norsk](https://check.openline.com/no/) · [Dansk](https://check.openline.com/da/) · [Suomi](https://check.openline.com/fi/) · [Čeština](https://check.openline.com/cs/) · [Română](https://check.openline.com/ro/) · [Magyar](https://check.openline.com/hu/) · [Ελληνικά](https://check.openline.com/el/) · [Українська](https://check.openline.com/uk/) · [Български](https://check.openline.com/bg/)
+
+- **Switcher:** a flag button in the top bar opens the list of languages in their own names. The current search is kept when switching, and the choice is remembered.
+- **First visit:** on the English home page, visitors whose browser prefers another supported language are sent to it once; crawlers and embeds are left alone.
+- **Everything is translated:** page text, FAQ, metadata and structured data, filters, counts with correct plural forms, empty states, warning badges and their explanations, accessibility labels and the 404 page. Device names, model codes and brands stay as manufacturers write them.
+- **Embeds:** use `/<lang>/?embed=1` (for example `/fr/?embed=1`) to show the modal view in another language.
+
+### How translations are made
+
+English in [`scripts/i18n/en.json`](scripts/i18n/en.json) is the only source. [`scripts/translate_i18n.py`](scripts/translate_i18n.py) sends it through [OpenRouter](https://openrouter.ai): a fast multilingual model drafts each language, then a different model family proofreads it as a native speaker against the English source. Every result is checked for missing keys, changed `{placeholders}`, altered HTML and incomplete plural forms before it is accepted. Accepted translations are cached with a hash of the English source, so only changed text is sent again.
+
+```sh
+# after editing scripts/i18n/en.json
+OPENROUTER_API_KEY=… python3 scripts/translate_i18n.py      # translate + proofread changed languages
+python3 scripts/build_i18n.py --version 25                 # regenerate pages, dictionaries, 404 and sitemap
+```
+
+Edit `scripts/i18n/index.template.html`, never the generated `index.html` or language folders. Bump `--version` on every deploy so browsers fetch the new CSS and JavaScript.
+
+---
+
 ## Search and sharing
 
 [check.openline.com](https://check.openline.com) is set up to be found and shared:
 
-- Title, description, canonical URL and robots directives on the main page; the modal reference is `noindex`.
+- Title, description, canonical URL and robots directives on every language page; the modal reference is `noindex`.
+- `hreflang` alternates for all 33 languages plus `x-default`, `og:locale` and `og:locale:alternate`, and a sitemap listing every language with its alternates.
 - Open Graph and X cards with a dedicated [1200×630 card](og.png) and `@askopenline` attribution.
-- JSON-LD for Organization, WebSite (with a search action), WebApplication and FAQPage, matching the visible FAQ.
-- Shareable searches: [check.openline.com/?q=pixel+9](https://check.openline.com/?q=pixel+9) opens with results, and the address bar follows the search.
+- JSON-LD for Organization, WebSite, WebApplication (with a search action) and FAQPage, translated per language and matching the visible FAQ.
+- Shareable searches in any language: [check.openline.com/?q=pixel+9](https://check.openline.com/?q=pixel+9) or [check.openline.com/fr/?q=pixel+9](https://check.openline.com/fr/?q=pixel+9) open with results, and the address bar follows the search.
 - Self-hosted favicons, Apple touch icon, web manifest, `robots.txt` and `sitemap.xml`.
 
 ---

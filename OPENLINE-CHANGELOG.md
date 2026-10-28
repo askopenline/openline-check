@@ -2,6 +2,17 @@
 
 This changelog records the Openline-maintained company edition. Original Git history, upstream notices, and earlier source release tags are preserved rather than rewritten.
 
+## 33 languages: 28 October 2026
+
+Tag: `company-2026.10.28`. Live on [check.openline.com](https://check.openline.com).
+
+- The checker is now available in the same 33 languages as [openline.com](https://openline.com), at the same paths (`/fr/`, `/de/`, `/latam/`, `/br/`, `/tw/` …).
+- A flag switcher in the top bar lists every language in its own name. It keeps the current search and remembers the choice; first-time visitors on the English home page are sent to their browser language once.
+- Everything is localized: page copy, FAQ, titles and descriptions, Open Graph and JSON-LD, filters, counts with proper plural forms and local number formats, empty states, warning badges and their explanations, accessibility labels and the 404 page.
+- SEO: `hreflang` alternates for every language plus `x-default`, `og:locale` alternates, and a sitemap listing all 33 pages.
+- Translations were drafted with Gemini 3.7 Flash and proofread by Claude Sonnet 5.5 as a native-speaker review through OpenRouter, then checked automatically for keys, placeholders, HTML and plural forms. Source strings live in `scripts/i18n/en.json`; `scripts/translate_i18n.py` and `scripts/build_i18n.py` regenerate everything.
+- Assets moved to absolute paths and the cache version is now 24.
+
 ## Search highlight fix: 26 October 2026
 
 Tag: `company-2026.10.26`. Live on [check.openline.com](https://check.openline.com).

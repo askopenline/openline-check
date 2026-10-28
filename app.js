@@ -1,6 +1,50 @@
 (function () {
   "use strict";
 
+  // ---------- i18n ----------
+  // Each page loads /i18n/<lang>.js before this file, which sets
+  // window.OL_I18N = { lang, dict }. English is the source (i18n/en.json).
+  const I18N = window.OL_I18N || { lang: "en", dict: {} };
+  const LANG = I18N.lang || "en";
+  const DICT = I18N.dict || {};
+  const PLURAL = (() => {
+    try { return new Intl.PluralRules(LANG); } catch (e) { return new Intl.PluralRules("en"); }
+  })();
+  const NUM = (() => {
+    try { return new Intl.NumberFormat(LANG, { numberingSystem: "latn" }); } catch (e) { return new Intl.NumberFormat("en"); }
+  })();
+  function fmt(n) { return NUM.format(n); }
+  function has(key) { return Object.prototype.hasOwnProperty.call(DICT, key); }
+  function fill(str, vars) {
+    return String(str).replace(/\{(\w+)\}/g, (m, k) => (vars && k in vars ? vars[k] : m));
+  }
+  function t(key, vars) {
+    const v = has(key) ? DICT[key] : key;
+    return fill(typeof v === "object" ? (v.other || "") : v, vars);
+  }
+  function tn(key, n, vars) {
+    const v = DICT[key];
+    const all = Object.assign({ n: fmt(n) }, vars || {});
+    if (!v || typeof v !== "object") return fill(v || key, all);
+    const cat = PLURAL.select(n);
+    return fill(v[cat] != null ? v[cat] : v.other, all);
+  }
+  function listFormat(parts) {
+    try {
+      return new Intl.ListFormat(LANG, { style: "long", type: "disjunction" }).format(parts);
+    } catch (e) {
+      return parts.join(", ");
+    }
+  }
+  // Device notes are short English labels joined with " · ".
+  // Translate each label; the raw English note still drives the explanation lookup.
+  function noteLabel(note) {
+    return String(note)
+      .split(" · ")
+      .map((p) => (has("note." + p) ? DICT["note." + p] : p))
+      .join(" · ");
+  }
+
   const $q = document.getElementById("q");
   const $clear = document.getElementById("clear");
   const $list = document.getElementById("list");
@@ -380,147 +424,130 @@
   function regionalExplanation(note) {
     // Order matters — most specific first.
     if (/Carrier watch plan/i.test(note)) {
-      return "Cellular smartwatches get their eSIM through a carrier watch plan, set up from the paired phone’s companion app (Apple Watch app, Galaxy Wearable, Pixel Watch app). Phone or travel eSIM QR codes can’t be installed on the watch directly, so check that your carrier offers a plan for this watch.";
+      return t("exp.carrierWatch");
     }
     if (/GPS only/i.test(note)) {
-      return "This is the GPS-only version. It has no cellular radio, so it can’t use any eSIM. The GPS + Cellular version of the same watch has a different model number.";
+      return t("exp.gpsOnly");
     }
     if (/CN\/HK\/MO: dual nano-SIM/i.test(note)) {
-      return "iPhones sold in mainland China, Hong Kong and Macao for this generation have two physical nano-SIM slots and no eSIM. Openline can’t install on these units. Check the model number under Settings › General › About.";
+      return t("exp.cnHkMoDualNano");
     }
     if (/CN: dual nano-SIM/i.test(note)) {
-      return "The mainland China version of this phone uses two physical nano-SIM cards and has no eSIM. Models sold everywhere else support eSIM. Check the model number under Settings › General › About.";
+      return t("exp.cnDualNano");
     }
     if (/CN: local eSIM rules/i.test(note)) {
-      return "The mainland China version supports eSIM, but Chinese carriers only activate eSIM in their stores with ID checks, and overseas eSIM profiles can’t be installed while you’re in mainland China. Outside China, travel eSIMs such as Openline install normally.";
+      return t("exp.cnLocalRules");
     }
     if (/eSIM only in US\/JP\/CA\/Gulf/i.test(note)) {
-      return "Units sold in the United States, Canada, Japan, Mexico and the Gulf states have no SIM tray and work with eSIM only. Elsewhere the phone also has a nano-SIM tray, and mainland China units may lack eSIM. Openline works on every eSIM-capable version.";
+      return t("exp.esimOnlyUsJpCaGulf");
     }
     if (/no SIM tray/i.test(note)) {
-      return "This version has no physical SIM tray: every line, including Openline, is added as an eSIM. You can store several eSIMs and switch between them in Settings.";
+      return t("exp.noSimTray");
     }
     if (/iDEN/i.test(note)) {
-      return "This device runs on Motorola’s iDEN network (Nextel / Boost push-to-talk), which was fully decommissioned by Sprint in June 2013. It cannot connect to any modern cellular network — eSIM or otherwise. Museum/collector item only.";
+      return t("exp.iden");
     }
     if (/CDMA · Verizon/i.test(note)) {
-      return "This is a CDMA-only device built for Verizon’s legacy 2G/3G CDMA network, which was shut down on December 31, 2022. It has no SIM slot at all (physical or eSIM) — CDMA authenticates on the network via the device’s ESN/MEID, not a SIM. It cannot be used with Openline or any modern carrier.";
+      return t("exp.cdmaVerizon");
     }
     if (/CDMA · Sprint/i.test(note)) {
-      return "This is a CDMA device built for Sprint’s legacy network, which T-Mobile shut down permanently on May 31, 2022. Newer Sprint models added LTE/GSM but earlier ones are CDMA-only and cannot connect to any modern network — with or without eSIM.";
+      return t("exp.cdmaSprint");
     }
     if (/3G\/4G · sunset|3G free · deprecated|No eSIM in most regions/i.test(note)) {
-      return "This device relies on 3G or older 4G networks that carriers have shut down (AT&T 3G ended February 2022, T-Mobile February 2022, Verizon December 2022, most European 3G by 2025). Even if it has a working SIM slot, there’s no network for it to connect to in most countries.";
+      return t("exp.sunset");
     }
     if (/Windows Phone/i.test(note)) {
-      return "This runs Windows Phone (or Windows 10 Mobile), which Microsoft discontinued in 2019 — the Store, security patches, and most first-party services are all shut down. It has no eSIM hardware and virtually no modern app support. Unusable as a daily driver.";
+      return t("exp.windowsPhone");
     }
     if (/KaiOS/i.test(note)) {
-      return "This is a KaiOS feature phone. Almost no KaiOS device supports eSIM — they use a physical SIM (usually a nano-SIM) and are targeted at cheap 4G-only feature-phone markets like India (JioPhone) and Africa. Openline cannot install here.";
+      return t("exp.kaios");
     }
     if (/Vehicle telematics/i.test(note)) {
-      return "This is a vehicle telematics module (Tesla, BMW, Audi, etc.) with a factory-embedded eSIM soldered onto the car’s connectivity board. The eSIM is provisioned by the automaker at the factory and cannot be swapped for a user-installed profile like Openline. Not user-serviceable.";
+      return t("exp.telematics");
     }
     if (/GPS\/satellite tracker/i.test(note)) {
-      return "This is a satellite/GPS communicator (Garmin inReach, SPOT, Zoleo, Iridium GO) that uses the Iridium or Globalstar satellite network — not GSM/LTE cellular. It cannot use an eSIM in the conventional sense; connectivity is tied to a proprietary subscription with the tracker’s manufacturer.";
+      return t("exp.satellite");
     }
     if (/Medical alert/i.test(note)) {
-      return "This is a medical alert or PERS (personal emergency response) device. Its cellular radio is locked to the service provider (Lively, Medical Guardian, Life Alert, Bay Alarm) and only works with their monitoring subscription. It cannot install third-party eSIMs.";
+      return t("exp.medical");
     }
     if (/Enterprise rugged/i.test(note)) {
-      return "This is a Samsung Enterprise / Rugged (Galaxy XCover series) device intended for field workforces — warehouses, healthcare, hospitality. It supports eSIM but activation may go through your employer’s Samsung Knox MDM configuration. Openline installs like on any consumer phone if the device is unlocked.";
+      return t("exp.rugged");
     }
     if (/HarmonyOS/i.test(note)) {
-      return "This device runs HarmonyOS (Huawei) with no Google Mobile Services. eSIM activation typically requires the Huawei EMUI/HarmonyOS carrier-services app; Openline profiles will provision via the QR code, but Google Wallet-based activations do not work. Devices sold in mainland China may additionally reject international eSIM profiles due to CN firmware restrictions.";
+      return t("exp.harmony");
     }
     if (/dual[- ]eSIM only/i.test(note)) {
-      return "This variant supports two eSIMs simultaneously but has no physical SIM tray. Openline works — you just cannot combine it with a nano-SIM. On some regional builds only one eSIM can be active at a time.";
+      return t("exp.dualEsimOnly");
     }
     if (/EU carrier/i.test(note)) {
-      return "Some European carrier-locked variants of this device shipped with eSIM disabled at the firmware level. Unlocked/global-open models support eSIM normally. Check with your original carrier if activation fails.";
+      return t("exp.euCarrier");
     }
     if (/US carrier variant/i.test(note)) {
-      return "This is a US-carrier-branded variant (AT&T, T-Mobile, Verizon, Sprint) with locked firmware and often carrier-specific band support. eSIM may be disabled or restricted to the branding carrier’s profiles. Unlocked international units of the same model typically work with Openline; carrier-branded units may not.";
+      return t("exp.usCarrier");
     }
     if (/Verizon/i.test(note)) {
-      return "Verizon-branded units of this Pixel had eSIM disabled at launch on the Verizon network. Unlocked and non-Verizon carrier units support eSIM normally.";
+      return t("exp.verizon");
     }
     if (/Google Fi/i.test(note)) {
-      return "On this generation of Pixel, eSIM was only available through Google Fi in the US. Other carriers used physical SIM only. Global unlocked units support eSIM everywhere.";
+      return t("exp.googleFi");
     }
     if (/US: eSIM only/i.test(note)) {
-      return "On US-purchased units of this iPhone, Apple removed the physical SIM tray entirely — you must use an eSIM. Everywhere else, the phone has a physical SIM tray in addition to eSIM. Openline still works either way.";
+      return t("exp.usEsimOnly");
     }
     if (/CN[- ]only|activation may fail abroad|CN\/HK\/KR excluded/i.test(note)) {
-      return "This device ships with China-domestic firmware. eSIM support is present on paper but international profiles frequently fail to activate outside mainland China. If you plan to travel, verify eSIM activation with the seller before purchase.";
+      return t("exp.cnOnly");
     }
     if (/JP domestic|Rakuten/i.test(note)) {
-      return "Japanese carrier-branded phones (NTT DoCoMo, au, SoftBank, Rakuten) are usually band-locked to Japan’s frequency plan. eSIM hardware works in Japan; overseas activation depends on band overlap with local networks.";
+      return t("exp.jpDomestic");
     }
     if (/region[- ]locked/i.test(note)) {
-      return "This device’s eSIM activation is region-locked at the firmware level. It only accepts eSIM profiles from carriers in the country/region it was sold in.";
+      return t("exp.regionLocked");
     }
     if (/KR only/i.test(note)) {
-      return "This model is only sold in South Korea and uses KT/SKT/LGU+ carrier bands. eSIM hardware is present but activation abroad is unreliable.";
+      return t("exp.krOnly");
     }
     if (/Foldable/i.test(note)) {
-      return "This is a foldable device — the eSIM slot is present but note that some foldable variants sold in China omit international eSIM support. Verify the model code matches the global SKU.";
+      return t("exp.foldable");
     }
     if (/Mobile hotspot/i.test(note)) {
-      return "This is a portable Wi-Fi hotspot / MiFi router rather than a phone. It accepts an eSIM to share cellular data with your other devices. Openline provisions the same way as on a phone.";
+      return t("exp.hotspot");
     }
     if (/SIM tray only/i.test(note)) {
-      return "This device has a cellular radio, but only accepts a physical nano-SIM or micro-SIM — there’s no eSIM chip. You can’t install Openline as an eSIM here; you’d need a physical SIM plan instead.";
+      return t("exp.simTrayOnly");
     }
     if (/Wi-Fi \+ Cellular only|Wi-Fi only/i.test(note)) {
-      return "This variant is Wi-Fi only — no cellular modem. It cannot install any eSIM. Look for the LTE / 5G / Cellular version of the same model.";
+      return t("exp.wifiOnly");
     }
     if (/E-reader/i.test(note)) {
-      return "This is an e-reader with a factory-embedded cellular modem tied to the manufacturer’s free-data plan (Amazon Whispernet, B&N nook, etc.). The eSIM/SIM is not user-provisionable — you can’t swap in an Openline profile.";
+      return t("exp.ereader");
     }
     if (/Cellular · eSIM only/i.test(note)) {
-      return "This variant has cellular connectivity via eSIM only — there’s no physical SIM tray on the device. Openline installs directly via QR code.";
+      return t("exp.cellularEsimOnly");
     }
     if (/Unverified variant/i.test(note)) {
-      return "Our data links this model code to more than one product family. That usually means Apple/Samsung/Google reused an internal number across generations, or a regional SKU was renamed. Openline should still work, but if the model number on the box doesn’t match the device you’re looking at, double-check with the manufacturer before purchase.";
+      return t("exp.unverifiedVariant");
     }
     if (/Cross-brand model code/i.test(note)) {
-      return "This model code also appears on a device from a different brand (Vivo/iQOO, Xiaomi/POCO, Nokia/HMD, Nubia/ZTE etc.). That’s usually a corporate sibling — the hardware is often identical, sometimes rebadged — but eSIM support and carrier certification can differ between the two brands. Verify against your unit’s actual retail packaging.";
+      return t("exp.crossBrand");
     }
     if (/Model code unverified/i.test(note)) {
-      return "We don’t have an authoritative model/part number for this device — usually because it’s a wearable, vehicle telematics unit, hotspot, or accessory whose SKU isn’t publicly published. eSIM support is on the manufacturer’s spec sheet, but Openline can’t match a specific hardware code to guarantee compatibility. Verify with the maker before relying on it.";
+      return t("exp.modelUnverified");
     }
     if (/Ambiguous name/i.test(note)) {
-      return "The product name here is very short (“13”, “F7”, “M6”…) and easy to confuse with same-numbered models from other brands or generations. Check the brand and model code on your device to make sure this entry actually matches what you own.";
+      return t("exp.ambiguous");
     }
     if (/CN firmware/i.test(note)) {
-      return "This unit ships with China-domestic firmware. eSIM hardware is present, but the Chinese firmware often blocks activation of international eSIM profiles. If you plan to use Openline outside mainland China, verify with the seller that the firmware isn’t region-locked before purchase.";
+      return t("exp.cnFirmware");
     }
     // Fallback — "excluded" pattern
     const raw = note.replace(/\s+excluded/i, "").trim();
-    const regionMap = {
-      US: "the United States",
-      HK: "Hong Kong",
-      CN: "mainland China",
-      KR: "South Korea",
-      JP: "Japan",
-      AU: "Australia",
-      TW: "Taiwan",
-      SEA: "Southeast Asia",
-      EU: "the European Union",
-      IN: "India",
-      UK: "the United Kingdom",
-    };
-    const parts = raw.split("/").map((p) => regionMap[p.trim()] || p.trim());
-    const list =
-      parts.length === 1 ? parts[0] :
-      parts.length === 2 ? parts.join(" or ") :
-      parts.slice(0, -1).join(", ") + ", or " + parts[parts.length - 1];
-    return (
-      "Units of this device sold in " + list + " ship without eSIM hardware — only the physical SIM tray works. " +
-      "Everywhere else, eSIM is supported and Openline will activate normally. " +
-      "If you bought yours abroad or through a grey-market importer, check the model number against the manufacturer's list."
-    );
+    const parts = raw.split("/").map((p) => {
+      const code = p.trim();
+      const k = "region." + code;
+      return has(k) ? t(k) : code;
+    });
+    return t("exp.regionExcluded", { regions: listFormat(parts) });
   }
 
   // Pre-index
@@ -560,7 +587,7 @@
     btn.setAttribute("aria-pressed", "false");
     btn.innerHTML = `
       <span class="cat-name">${escapeHtml(name)}</span>
-      <span class="cat-count">${count} device${count === 1 ? "" : "s"}</span>
+      <span class="cat-count">${escapeHtml(tn("cat.count", count))}</span>
     `;
     btn.addEventListener("click", () => {
       const set = group === "compat" ? selectedCompat : selectedBrands;
@@ -572,8 +599,8 @@
     return btn;
   }
 
-  $compatCats.appendChild(catButton({ value: "yes", name: "Compatible", count: COMPAT_COUNTS.yes, group: "compat" }));
-  $compatCats.appendChild(catButton({ value: "no", name: "Not compatible", count: COMPAT_COUNTS.no, group: "compat" }));
+  $compatCats.appendChild(catButton({ value: "yes", name: t("status.ok"), count: COMPAT_COUNTS.yes, group: "compat" }));
+  $compatCats.appendChild(catButton({ value: "no", name: t("status.no"), count: COMPAT_COUNTS.no, group: "compat" }));
 
   for (const b of BRANDS) {
     $brandCats.appendChild(catButton({ value: b, name: b, count: BRAND_COUNTS[b], group: "brand" }));
@@ -769,18 +796,18 @@
       $list.innerHTML = visible
         .map(({ d }) => {
           const cls = d.esim ? "ok" : "err";
-          const status = d.esim ? "Compatible" : "Not compatible";
+          const status = d.esim ? t("status.ok") : t("status.no");
           const nameHtml = highlight(`${d.brand} ${d.name}`, tokens);
           const modelHtml = highlight(d.model, tokens);
           let note = "";
           if (d.note) {
             if (isRegionalNote(d.note)) {
-              note = `<button type="button" class="note-warn" data-note="${escapeHtml(d.note)}" aria-label="Regional caveat: ${escapeHtml(d.note)}">
+              note = `<button type="button" class="note-warn" data-note="${escapeHtml(d.note)}" aria-label="${escapeHtml(t("note.caveatAria", { note: noteLabel(d.note) }))}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
-                <span>${escapeHtml(d.note)}</span>
+                <span>${escapeHtml(noteLabel(d.note))}</span>
               </button>`;
             } else {
-              note = `<span class="note">${escapeHtml(d.note)}</span>`;
+              note = `<span class="note">${escapeHtml(noteLabel(d.note))}</span>`;
             }
           }
           return `
@@ -794,7 +821,7 @@
                   ${note}
                 </div>
               </div>
-              <span class="badge" aria-label="eSIM ${status}">${status}</span>
+              <span class="badge" aria-label="${escapeHtml(d.esim ? t("status.okAria") : t("status.noAria"))}">${status}</span>
             </li>
           `;
         })
@@ -803,28 +830,28 @@
 
     // Counts, title & summary
     const total = DEVICES.length;
-    if ($footerTotal) $footerTotal.textContent = total.toLocaleString();
+    if ($footerTotal) $footerTotal.textContent = fmt(total);
 
     const active = tokens.length || selectedCompat.size || selectedBrands.size;
     if (active) {
-      $title.textContent = "Matching devices";
+      $title.textContent = t("results.matching");
       const shownN = Math.min(matches.length, MAX);
-      const suffix = matches.length > MAX ? ` · showing first ${MAX}` : "";
-      $count.innerHTML = `<strong>${matches.length.toLocaleString()}</strong> of ${total.toLocaleString()}${suffix}`;
+      const suffix = matches.length > MAX ? t("results.showingFirst", { max: fmt(MAX) }) : "";
+      $count.innerHTML = t("results.ofTotalHtml", { n: fmt(matches.length), total: fmt(total) }) + escapeHtml(suffix);
     } else {
-      $title.textContent = "All devices";
-      $count.innerHTML = `<strong>${total.toLocaleString()}</strong> total`;
+      $title.textContent = t("results.all");
+      $count.innerHTML = t("results.totalHtml", { n: fmt(total) });
     }
 
     // Summary in filter bar
     const bits = [];
-    if (selectedCompat.size === 1) bits.push(selectedCompat.has("yes") ? "Compatible only" : "Not compatible only");
-    else if (selectedCompat.size === 2) bits.push("All statuses");
+    if (selectedCompat.size === 1) bits.push(selectedCompat.has("yes") ? t("filters.compatOnly") : t("filters.notCompatOnly"));
+    else if (selectedCompat.size === 2) bits.push(t("filters.allStatuses"));
     if (selectedBrands.size) {
       const list = Array.from(selectedBrands);
-      bits.push(list.length <= 2 ? list.join(", ") : `${list.length} brands`);
+      bits.push(list.length <= 2 ? list.join(", ") : tn("filters.nBrands", list.length));
     }
-    $filtersSummary.textContent = bits.length ? bits.join(" · ") : "All devices · All brands";
+    $filtersSummary.textContent = bits.length ? bits.join(" · ") : t("filters.summaryAll");
 
     // Active-filter badge next to the Filters label
     const activeFilters = selectedCompat.size + selectedBrands.size;
@@ -837,7 +864,7 @@
 
     // Panel footer summary
     if (active) {
-      $filtersCountSummary.innerHTML = `<strong>${matches.length.toLocaleString()}</strong> device${matches.length === 1 ? "" : "s"} match`;
+      $filtersCountSummary.innerHTML = tn("filters.matchHtml", matches.length);
     } else {
       $filtersCountSummary.innerHTML = "";
     }
@@ -868,11 +895,8 @@
 
     // Case A: search + filters, and clearing filters would surface matches
     if (hasSearch && hasFilters && matchesSansFilters > 0) {
-      $emptyTitle.textContent = "No devices match both your search and filters.";
-      $emptyBody.innerHTML =
-        "Your search for " + "<em>" + escapeHtml(rawQuery) + "</em>" +
-        " returns " + "<strong>" + matchesSansFilters.toLocaleString() + "</strong>" +
-        " device" + (matchesSansFilters === 1 ? "" : "s") + " overall, but none of them match your current filter selection. Maybe your filters are causing the conflict?";
+      $emptyTitle.textContent = t("empty.bothTitle");
+      $emptyBody.innerHTML = tn("empty.bothBodyHtml", matchesSansFilters, { q: escapeHtml(rawQuery) });
       $emptyActions.hidden = false;
       $emptyActions.querySelector('[data-action="reset-filters"]').hidden = false;
       $emptyActions.querySelector('[data-action="clear-search"]').hidden = false;
@@ -881,8 +905,8 @@
 
     // Case B: only filters set, no results
     if (!hasSearch && hasFilters) {
-      $emptyTitle.textContent = "No devices match your filters.";
-      $emptyBody.innerHTML = "Try loosening your filter selection — combining rare compatibility statuses with narrow brands can leave nothing behind.";
+      $emptyTitle.textContent = t("empty.filtersTitle");
+      $emptyBody.innerHTML = escapeHtml(t("empty.filtersBody"));
       $emptyActions.hidden = false;
       $emptyActions.querySelector('[data-action="reset-filters"]').hidden = false;
       $emptyActions.querySelector('[data-action="clear-search"]').hidden = true;
@@ -891,10 +915,8 @@
 
     // Case C: only search, no results
     if (hasSearch && !hasFilters) {
-      $emptyTitle.textContent = "No exact match.";
-      $emptyBody.innerHTML =
-        "Try the brand alone (e.g. " + "<em>Samsung</em>" + ") or the exact model number (e.g. " +
-        "<em>SM-S921B</em>" + "). If your phone is newer than 2021 and released outside mainland China, chances are very high that it supports eSIM.";
+      $emptyTitle.textContent = t("empty.noMatchTitle");
+      $emptyBody.innerHTML = t("empty.noMatchBodyHtml");
       $emptyActions.hidden = false;
       $emptyActions.querySelector('[data-action="reset-filters"]').hidden = true;
       $emptyActions.querySelector('[data-action="clear-search"]').hidden = false;
@@ -902,7 +924,7 @@
     }
 
     // Case D: unlikely fallback (no search, no filters, but empty)
-    $emptyTitle.textContent = "Nothing here yet.";
+    $emptyTitle.textContent = t("empty.nothing");
     $emptyBody.textContent = "";
     $emptyActions.hidden = true;
   }
@@ -934,12 +956,12 @@
     const pop = document.createElement("div");
     pop.className = "note-popover";
     pop.setAttribute("role", "dialog");
-    pop.setAttribute("aria-label", "Regional caveat");
+    pop.setAttribute("aria-label", t("popover.aria"));
     pop.innerHTML = `
       <div class="note-popover-head">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
-        <strong>${escapeHtml(note)}</strong>
-        <button type="button" class="note-popover-close" aria-label="Close">
+        <strong>${escapeHtml(noteLabel(note))}</strong>
+        <button type="button" class="note-popover-close" aria-label="${escapeHtml(t("popover.close"))}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
@@ -1013,10 +1035,10 @@
   });
 
   // ---------- Initial stats ----------
-  $statTotal.textContent = DEVICES.length.toLocaleString();
-  $statYes.textContent = COMPAT_COUNTS.yes.toLocaleString();
-  $statNo.textContent = COMPAT_COUNTS.no.toLocaleString();
-  $statBrands.textContent = BRANDS.length.toLocaleString();
+  $statTotal.textContent = fmt(DEVICES.length);
+  $statYes.textContent = fmt(COMPAT_COUNTS.yes);
+  $statNo.textContent = fmt(COMPAT_COUNTS.no);
+  $statBrands.textContent = fmt(BRANDS.length);
 
   // ---------- Shareable search links (?q=pixel+9) ----------
   const BASE_TITLE = document.title;
@@ -1034,7 +1056,7 @@
         if (q) params.set("q", q); else params.delete("q");
         const qs = params.toString();
         history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
-        document.title = q ? q + " eSIM compatibility · Openline" : BASE_TITLE;
+        document.title = q ? t("meta.searchTitle", { q: q }) : BASE_TITLE;
       } catch (e) {}
     }, 350);
   }
@@ -1043,6 +1065,54 @@
   document.addEventListener("click", (e) => {
     if (e.target.closest("#clear, button[data-action='clear-search']")) syncUrl();
   });
+
+  // ---------- Language switcher ----------
+  const $lang = document.getElementById("lang");
+  if ($lang) {
+    const $btn = $lang.querySelector(".lang-btn");
+    const $menu = $lang.querySelector(".lang-menu");
+    const setOpen = (open) => {
+      $btn.setAttribute("aria-expanded", open ? "true" : "false");
+      $menu.hidden = !open;
+      if (open) {
+        const cur = $menu.querySelector('[aria-current="true"]') || $menu.querySelector("a");
+        if (cur) cur.focus();
+      }
+    };
+    $btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setOpen($menu.hidden);
+    });
+    document.addEventListener("click", (e) => {
+      if (!$menu.hidden && !$lang.contains(e.target)) setOpen(false);
+    });
+    $lang.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !$menu.hidden) {
+        setOpen(false);
+        $btn.focus();
+      }
+      if ((e.key === "ArrowDown" || e.key === "ArrowUp") && !$menu.hidden) {
+        e.preventDefault();
+        const items = Array.from($menu.querySelectorAll("a"));
+        const i = items.indexOf(document.activeElement);
+        const next = e.key === "ArrowDown" ? Math.min(items.length - 1, i + 1) : Math.max(0, i - 1);
+        items[next].focus();
+      }
+    });
+    $menu.addEventListener("click", (e) => {
+      const a = e.target.closest("a[data-lang]");
+      if (!a) return;
+      try { localStorage.setItem("ol-lang", a.dataset.lang); } catch (err) {}
+      const params = new URLSearchParams(location.search);
+      const q = $q.value.trim();
+      if (q) params.set("q", q); else params.delete("q");
+      const qs = params.toString();
+      if (qs) {
+        e.preventDefault();
+        location.href = a.getAttribute("href") + "?" + qs;
+      }
+    });
+  }
 
   render();
   if ($q.value) syncUrl();

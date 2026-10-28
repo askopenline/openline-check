@@ -1,0 +1,266 @@
+[
+ {
+  "code": "en",
+  "path": "",
+  "name": "English",
+  "flag": "gb",
+  "og": "en_GB",
+  "english": "English"
+ },
+ {
+  "code": "es",
+  "path": "es",
+  "name": "Español",
+  "flag": "es",
+  "og": "es_ES",
+  "english": "Spanish (Spain)"
+ },
+ {
+  "code": "fr",
+  "path": "fr",
+  "name": "Français",
+  "flag": "fr",
+  "og": "fr_FR",
+  "english": "French (France)"
+ },
+ {
+  "code": "de",
+  "path": "de",
+  "name": "Deutsch",
+  "flag": "de",
+  "og": "de_DE",
+  "english": "German"
+ },
+ {
+  "code": "it",
+  "path": "it",
+  "name": "Italiano",
+  "flag": "it",
+  "og": "it_IT",
+  "english": "Italian"
+ },
+ {
+  "code": "pt",
+  "path": "pt",
+  "name": "Português",
+  "flag": "pt",
+  "og": "pt_PT",
+  "english": "European Portuguese (Portugal)"
+ },
+ {
+  "code": "ja",
+  "path": "ja",
+  "name": "日本語",
+  "flag": "jp",
+  "og": "ja_JP",
+  "english": "Japanese"
+ },
+ {
+  "code": "zh",
+  "path": "zh",
+  "name": "中文（简体）",
+  "flag": "cn",
+  "og": "zh_CN",
+  "english": "Simplified Chinese (mainland China)"
+ },
+ {
+  "code": "tr",
+  "path": "tr",
+  "name": "Türkçe",
+  "flag": "tr",
+  "og": "tr_TR",
+  "english": "Turkish"
+ },
+ {
+  "code": "ru",
+  "path": "ru",
+  "name": "Русский",
+  "flag": "ru",
+  "og": "ru_RU",
+  "english": "Russian"
+ },
+ {
+  "code": "zh-TW",
+  "path": "tw",
+  "name": "中文（繁體）",
+  "flag": "tw",
+  "og": "zh_TW",
+  "english": "Traditional Chinese (Taiwan)"
+ },
+ {
+  "code": "es-419",
+  "path": "latam",
+  "name": "Español (Latinoamérica)",
+  "flag": "mx",
+  "og": "es_LA",
+  "english": "Latin American Spanish"
+ },
+ {
+  "code": "pt-BR",
+  "path": "br",
+  "name": "Português (Brasil)",
+  "flag": "br",
+  "og": "pt_BR",
+  "english": "Brazilian Portuguese"
+ },
+ {
+  "code": "ko",
+  "path": "ko",
+  "name": "한국어",
+  "flag": "kr",
+  "og": "ko_KR",
+  "english": "Korean"
+ },
+ {
+  "code": "hi",
+  "path": "hi",
+  "name": "हिन्दी",
+  "flag": "in",
+  "og": "hi_IN",
+  "english": "Hindi"
+ },
+ {
+  "code": "bn",
+  "path": "bn",
+  "name": "বাংলা",
+  "flag": "bd",
+  "og": "bn_IN",
+  "english": "Bengali"
+ },
+ {
+  "code": "id",
+  "path": "id",
+  "name": "Bahasa Indonesia",
+  "flag": "id",
+  "og": "id_ID",
+  "english": "Indonesian"
+ },
+ {
+  "code": "ms",
+  "path": "ms",
+  "name": "Bahasa Melayu",
+  "flag": "my",
+  "og": "ms_MY",
+  "english": "Malay (Malaysia)"
+ },
+ {
+  "code": "vi",
+  "path": "vi",
+  "name": "Tiếng Việt",
+  "flag": "vn",
+  "og": "vi_VN",
+  "english": "Vietnamese"
+ },
+ {
+  "code": "th",
+  "path": "th",
+  "name": "ไทย",
+  "flag": "th",
+  "og": "th_TH",
+  "english": "Thai"
+ },
+ {
+  "code": "tl",
+  "path": "tl",
+  "name": "Filipino",
+  "flag": "ph",
+  "og": "tl_PH",
+  "english": "Filipino (Tagalog)"
+ },
+ {
+  "code": "pl",
+  "path": "pl",
+  "name": "Polski",
+  "flag": "pl",
+  "og": "pl_PL",
+  "english": "Polish"
+ },
+ {
+  "code": "nl",
+  "path": "nl",
+  "name": "Nederlands",
+  "flag": "nl",
+  "og": "nl_NL",
+  "english": "Dutch"
+ },
+ {
+  "code": "sv",
+  "path": "sv",
+  "name": "Svenska",
+  "flag": "se",
+  "og": "sv_SE",
+  "english": "Swedish"
+ },
+ {
+  "code": "no",
+  "path": "no",
+  "name": "Norsk",
+  "flag": "no",
+  "og": "nb_NO",
+  "english": "Norwegian Bokmål"
+ },
+ {
+  "code": "da",
+  "path": "da",
+  "name": "Dansk",
+  "flag": "dk",
+  "og": "da_DK",
+  "english": "Danish"
+ },
+ {
+  "code": "fi",
+  "path": "fi",
+  "name": "Suomi",
+  "flag": "fi",
+  "og": "fi_FI",
+  "english": "Finnish"
+ },
+ {
+  "code": "cs",
+  "path": "cs",
+  "name": "Čeština",
+  "flag": "cz",
+  "og": "cs_CZ",
+  "english": "Czech"
+ },
+ {
+  "code": "ro",
+  "path": "ro",
+  "name": "Română",
+  "flag": "ro",
+  "og": "ro_RO",
+  "english": "Romanian"
+ },
+ {
+  "code": "hu",
+  "path": "hu",
+  "name": "Magyar",
+  "flag": "hu",
+  "og": "hu_HU",
+  "english": "Hungarian"
+ },
+ {
+  "code": "el",
+  "path": "el",
+  "name": "Ελληνικά",
+  "flag": "gr",
+  "og": "el_GR",
+  "english": "Greek"
+ },
+ {
+  "code": "uk",
+  "path": "uk",
+  "name": "Українська",
+  "flag": "ua",
+  "og": "uk_UA",
+  "english": "Ukrainian"
+ },
+ {
+  "code": "bg",
+  "path": "bg",
+  "name": "Български",
+  "flag": "bg",
+  "og": "bg_BG",
+  "english": "Bulgarian"
+ }
+]

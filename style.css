@@ -766,3 +766,53 @@ main { max-width: var(--content-w); margin: 0 auto; padding: 0 22px 80px; }
   .faq-item summary { font-size: 15px; padding: 14px 44px 14px 16px; }
   .faq-item p { padding: 0 16px 14px; }
 }
+
+/* -------- 14 · Language switcher ---------- */
+.brand { min-width: 0; }
+.brand-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lang { position: relative; flex: none; margin-left: 12px; }
+.lang-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 12px 0 10px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: #fff; color: var(--ink-2);
+  font: inherit; font-size: 13.5px; font-weight: 600; letter-spacing: .02em;
+  cursor: pointer;
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.lang-btn:hover { border-color: #D9DBE0; box-shadow: var(--shadow-1); }
+.lang-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.lang-btn svg { color: var(--ink-3); transition: transform .15s ease; }
+.lang-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.lang-flag {
+  display: block; width: 20px; height: 15px; flex: none;
+  border-radius: 3px; object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(15, 17, 20, .08);
+}
+.lang-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 40;
+  width: 264px; max-height: min(70vh, 520px); overflow-y: auto;
+  margin: 0; padding: 6px; list-style: none;
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  overscroll-behavior: contain;
+}
+.lang-menu[hidden] { display: none; }
+.lang-menu a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 10px; border-radius: var(--radius-sm);
+  color: var(--ink); font-size: 14.5px; font-weight: 500; line-height: 1.25;
+}
+.lang-menu a:hover, .lang-menu a:focus-visible { background: var(--bg-3); text-decoration: none; outline: none; }
+.lang-menu a[aria-current="true"] { background: var(--accent-bg); font-weight: 600; }
+.lang-menu a[aria-current="true"]::after {
+  content: ""; margin-left: auto; width: 7px; height: 7px; border-radius: 50%; background: var(--brand);
+}
+@media (max-width: 640px) {
+  .lang { margin-left: 8px; }
+  .lang-btn { height: 34px; padding: 0 9px 0 8px; gap: 6px; font-size: 12.5px; }
+  .lang-menu { position: fixed; left: 12px; right: 12px; top: 58px; width: auto; max-height: calc(100vh - 80px); }
+}
+@media (max-width: 359px) {
+  .brand-sub { display: none; }
+}

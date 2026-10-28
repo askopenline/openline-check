@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Page not found · Openline Check</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" />
+    <style>
+      body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:Inter,system-ui,sans-serif;color:#0F1114;background:#fff;text-align:center;padding:24px}
+      img{width:44px;height:44px}
+      h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:22px 0 8px}
+      p{color:#6B7280;margin:0 0 26px;line-height:1.5}
+      a.btn{display:inline-block;background:#FF6A00;color:#fff;text-decoration:none;font-weight:600;padding:13px 22px;border-radius:999px}
+      a.btn:focus-visible{outline:2px solid #FF6A00;outline-offset:3px}
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icons/mark-56.png" alt="Openline" />
+      <h1>This page doesn’t exist</h1>
+      <p>But your device might still support eSIM.</p>
+      <a class="btn" href="/">Check my device</a>
+    </main>
+    <script>
+      (function () {
+        var NF = {{@nf}}, PATHS = {{@paths}}, HOME = {{@home}};
+        var code = PATHS[(location.pathname.split("/")[1] || "").toLowerCase()];
+        try { if (!code) { var s = localStorage.getItem("ol-lang"); if (s && NF[s]) code = s; } } catch (e) {}
+        if (!code) {
+          var langs = navigator.languages || [navigator.language || "en"];
+          for (var i = 0; i < langs.length && !code; i++) {
+            var t = String(langs[i] || "").toLowerCase(), b = t.split("-")[0];
+            if (b === "zh") code = /-(tw|hk|mo|hant)/.test(t) ? "zh-TW" : "zh";
+            else if (b === "pt") code = /-br/.test(t) ? "pt-BR" : "pt";
+            else if (b === "es") code = t === "es" || /-es/.test(t) ? "es" : "es-419";
+            else if (b === "nb" || b === "nn") code = "no";
+            else if (b === "fil") code = "tl";
+            else if (NF[b]) code = b;
+          }
+        }
+        var d = NF[code];
+        if (!d) return;
+        document.documentElement.lang = code;
+        document.title = d["nf.title"];
+        document.querySelector("h1").textContent = d["nf.h1"];
+        document.querySelector("main p").textContent = d["nf.p"];
+        var a = document.querySelector("a.btn");
+        a.textContent = d["nf.btn"];
+        a.setAttribute("href", HOME[code]);
+      })();
+    </script>
+  </body>
+</html>
