@@ -10,6 +10,7 @@ Tag: `company-2026.10.28b`. Live on [check.openline.com](https://check.openline.
 - The catalogue ships as a compact `devices.min.js` decoded with `JSON.parse` (395 KB instead of 931 KB before compression); JavaScript and CSS are minified. The build verifies the compact catalogue decodes to exactly `devices.js`.
 - Cache policy: versioned files and fonts cached for a year as immutable; flags, icons and the OG image for a week with background refresh; pages revalidated on every visit.
 - A service worker makes repeat visits instant and keeps the checker usable offline.
+- Cloudflare CDN switched on for `check.openline.com` (Proxied): static files are served from Cloudflare's edge worldwide; pages stay fresh from the origin. The service worker script is sent with `no-store` so it always updates.
 - Cache version 26.
 
 ## French punctuation fix: 28 October 2026

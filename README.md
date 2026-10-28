@@ -186,7 +186,8 @@ The production explorer is served at **[check.openline.com](https://check.openli
 | Host | Fly.io app `openline-check`, one always-on machine in Paris (`cdg`) |
 | Server | Caddy serving the static files with zstd/gzip and the cache policy below |
 | Source | The machine downloads a pinned commit of this repository at boot; `scripts/` is not served |
-| Domain | `check.openline.com` on Cloudflare DNS (DNS only), TLS issued by Fly via Let's Encrypt |
+| CDN | Cloudflare proxy in front of Fly: versioned files, fonts, flags and the catalogue are cached at Cloudflare's edge worldwide following the origin headers; pages are revalidated with the origin on every visit, so deploys need no purge |
+| Domain | `check.openline.com` on Cloudflare (Proxied, SSL mode Full); the `_acme-challenge.check` record stays DNS only so Fly keeps renewing its Let's Encrypt certificate |
 | Fallback | [openline-check.fly.dev](https://openline-check.fly.dev) |
 
 ### Performance and caching
@@ -201,7 +202,7 @@ The production explorer is served at **[check.openline.com](https://check.openli
 | Versioned files (`?v=N`) and fonts | `public, max-age=31536000, immutable` |
 | Flags, icons, OG image, manifest | `public, max-age=604800, stale-while-revalidate=604800` |
 | `robots.txt`, `sitemap.xml` | `public, max-age=3600` |
-| `sw.js` | `no-cache` |
+| `sw.js` | `no-store` (never cached by the CDN or the browser) |
 
 - **Service worker:** versioned assets, fonts and flags are served from the device cache; pages are fetched fresh with a 2.5 s fallback to the cached copy, so the checker opens instantly on repeat visits and still works offline.
 - **Releases:** `scripts/build_i18n.py --version N` regenerates every page with the new version, so a deploy invalidates browser, service-worker and CDN caches at once.
