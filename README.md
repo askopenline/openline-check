@@ -101,7 +101,10 @@ Open [the local explorer](http://127.0.0.1:8000) or [the modal reference](http:/
 
 | File | Responsibility |
 | --- | --- |
-| [`devices.js`](devices.js) | Device catalogue and compatibility notes |
+| [`devices.js`](devices.js) | Device catalogue and compatibility notes (readable source) |
+| `devices.min.js`, `app.min.js`, `style.min.css` | Generated, compact production files actually loaded by the pages |
+| `sw.js` | Generated service worker for instant repeat visits and offline use |
+| [`fonts/`](fonts/) | Self-hosted Inter variable font, split by script (OFL-1.1) |
 | [`app.js`](app.js) | Search, ranking, aliases, filters, and interface state |
 | [`index.html`](index.html) | Standalone application (English, generated) |
 | `fr/`, `de/`, `latam/`, `br/`, `tw/` … | Generated localized pages, one folder per language |
@@ -181,10 +184,27 @@ The production explorer is served at **[check.openline.com](https://check.openli
 | Layer | Setup |
 | --- | --- |
 | Host | Fly.io app `openline-check`, one always-on machine in Paris (`cdg`) |
-| Server | Caddy serving the static files with gzip/zstd, no-cache HTML and short-lived JS/CSS caching |
+| Server | Caddy serving the static files with zstd/gzip and the cache policy below |
 | Source | The machine downloads a pinned commit of this repository at boot; `scripts/` is not served |
 | Domain | `check.openline.com` on Cloudflare DNS (DNS only), TLS issued by Fly via Let's Encrypt |
 | Fallback | [openline-check.fly.dev](https://openline-check.fly.dev) |
+
+### Performance and caching
+
+- **No third-party requests:** the Inter font is self-hosted and split by script (Latin, Latin Extended, Cyrillic, Greek, Vietnamese), so each language only downloads what it renders; the Latin file is preloaded.
+- **Small payloads:** the catalogue ships as `devices.min.js`, a compact table decoded with `JSON.parse` (395 KB instead of 931 KB before compression, and checked to decode to exactly `devices.js` at build), with minified JavaScript and CSS.
+- **Cache policy:**
+
+| Resource | `Cache-Control` |
+| --- | --- |
+| Pages (`/`, `/fr/` …) | `public, max-age=0, must-revalidate` (ETag, answered with 304 when unchanged) |
+| Versioned files (`?v=N`) and fonts | `public, max-age=31536000, immutable` |
+| Flags, icons, OG image, manifest | `public, max-age=604800, stale-while-revalidate=604800` |
+| `robots.txt`, `sitemap.xml` | `public, max-age=3600` |
+| `sw.js` | `no-cache` |
+
+- **Service worker:** versioned assets, fonts and flags are served from the device cache; pages are fetched fresh with a 2.5 s fallback to the cached copy, so the checker opens instantly on repeat visits and still works offline.
+- **Releases:** `scripts/build_i18n.py --version N` regenerates every page with the new version, so a deploy invalidates browser, service-worker and CDN caches at once.
 
 GitHub is the source of truth. Pushing to `main` does not change production by itself: a release is published by pointing the Fly machine at the new commit and restarting it, then checking the live pages.
 

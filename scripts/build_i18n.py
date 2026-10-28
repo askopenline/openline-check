@@ -67,11 +67,71 @@ def plural_other(v):
     return v.get("other", "") if isinstance(v, dict) else v
 
 
+# ---------- static assets (minified, versioned, service worker) ----------
+
+def _node(script, data=None):
+    env = dict(os.environ)
+    extra = os.environ.get("OL_NODE_MODULES", "/tmp/fl/node/node_modules")
+    env["NODE_PATH"] = os.pathsep.join(x for x in (extra, env.get("NODE_PATH", "")) if x)
+    return subprocess.run(["node", "-e", script], input=data, capture_output=True, text=True, env=env)
+
+
+def build_assets(version):
+    """devices.min.js (compact + JSON.parse), app.min.js, style.min.css and sw.js."""
+    js = (
+        'eval(require("fs").readFileSync(%r,"utf8").replace("const DEVICES","global.DEVICES"));'
+        "const B=[...new Set(DEVICES.map(d=>d.brand))],N=[...new Set(DEVICES.filter(d=>d.note).map(d=>d.note))];"
+        "const R=DEVICES.map(d=>{const r=[B.indexOf(d.brand),d.name,d.model,d.year,d.esim?1:0];if(d.note)r.push(N.indexOf(d.note));return r});"
+        "const lit=s=>JSON.stringify(s).replace(/\\u2028/g,'\\\\u2028').replace(/\\u2029/g,'\\\\u2029');"
+        "process.stdout.write('/* Openline eSIM device catalogue (generated from devices.js) */\\n'+"
+        "'const DEVICES=(function(){var B='+JSON.stringify(B)+',N='+JSON.stringify(N)+',R=JSON.parse('+lit(JSON.stringify(R))+');'+"
+        "'return R.map(function(r){var d={brand:B[r[0]],name:r[1],model:r[2],year:r[3],esim:r[4]===1};if(r.length>5)d.note=N[r[5]];return d})})();\\n')"
+    ) % os.path.join(ROOT, "devices.js")
+    r = _node(js)
+    if r.returncode:
+        raise SystemExit("devices.min.js failed: " + r.stderr)
+    open(os.path.join(ROOT, "devices.min.js"), "w", encoding="utf-8").write(r.stdout)
+    # Round-trip check: the compact file must decode to exactly the source catalogue.
+    chk = _node(
+        'eval(require("fs").readFileSync(%r,"utf8").replace("const DEVICES","global.A"));'
+        'eval(require("fs").readFileSync(%r,"utf8").replace("const DEVICES","global.B"));'
+        "process.stdout.write(JSON.stringify(A)===JSON.stringify(B)?'same':'DIFF')"
+        % (os.path.join(ROOT, "devices.js"), os.path.join(ROOT, "devices.min.js")))
+    if chk.stdout != "same":
+        raise SystemExit("devices.min.js does not match devices.js")
+
+    src = open(os.path.join(ROOT, "app.js"), encoding="utf-8").read()
+    r = _node("const t=require('terser');let s='';process.stdin.on('data',c=>s+=c).on('end',async()=>{"
+              "const o=await t.minify(s,{compress:{passes:2},mangle:true,format:{comments:false}});process.stdout.write(o.code)})", src)
+    app_min = r.stdout if r.returncode == 0 and r.stdout else src
+    if app_min is src:
+        print("WARN terser unavailable, app.min.js is not minified", file=sys.stderr)
+    open(os.path.join(ROOT, "app.min.js"), "w", encoding="utf-8").write(app_min)
+
+    css = open(os.path.join(ROOT, "style.css"), encoding="utf-8").read()
+    r = _node("const c=require('csso');let s='';process.stdin.on('data',x=>s+=x).on('end',()=>process.stdout.write(c.minify(s).css))", css)
+    css_min = r.stdout if r.returncode == 0 and r.stdout else css
+    if css_min is css:
+        print("WARN csso unavailable, style.min.css is not minified", file=sys.stderr)
+    open(os.path.join(ROOT, "style.min.css"), "w", encoding="utf-8").write(css_min)
+
+    sw = open(os.path.join(I18N, "sw.template.js"), encoding="utf-8").read().replace("{{@v}}", str(version))
+    open(os.path.join(ROOT, "sw.js"), "w", encoding="utf-8").write(sw)
+
+    # Keep the hand-written modal reference on the current asset version.
+    mp = os.path.join(ROOT, "modal-preview.html")
+    m = open(mp, encoding="utf-8").read()
+    m = re.sub(r"\?v=\d+", "?v=%s" % version, m)
+    m = m.replace("/style.css?", "/style.min.css?").replace("/app.js?", "/app.min.js?")
+    open(mp, "w", encoding="utf-8").write(m)
+
+
 def build(version):
     en = load(os.path.join(I18N, "en.json"))
     locales = load(os.path.join(I18N, "locales.json"))
     tpl = open(os.path.join(I18N, "index.template.html"), encoding="utf-8").read()
     stats = device_stats()
+    build_assets(version)
     nums = number_formats([l["code"] for l in locales], [stats["total"], stats["brands"]])
 
     dicts = {}

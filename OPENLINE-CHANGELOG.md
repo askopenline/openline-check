@@ -2,6 +2,16 @@
 
 This changelog records the Openline-maintained company edition. Original Git history, upstream notices, and earlier source release tags are preserved rather than rewritten.
 
+## Faster loading and full caching: 28 October 2026
+
+Tag: `company-2026.10.28b`. Live on [check.openline.com](https://check.openline.com).
+
+- Inter is now self-hosted and split by script, with the Latin file preloaded: no more render-blocking Google Fonts stylesheet or third-party connections.
+- The catalogue ships as a compact `devices.min.js` decoded with `JSON.parse` (395 KB instead of 931 KB before compression); JavaScript and CSS are minified. The build verifies the compact catalogue decodes to exactly `devices.js`.
+- Cache policy: versioned files and fonts cached for a year as immutable; flags, icons and the OG image for a week with background refresh; pages revalidated on every visit.
+- A service worker makes repeat visits instant and keeps the checker usable offline.
+- Cache version 26.
+
 ## French punctuation fix: 28 October 2026
 
 - French now uses non-breaking spaces before ? ! : ; and inside « », so a question mark can no longer wrap onto its own line (e.g. the page title). Applied in `scripts/build_i18n.py` for every French string. Cache version 25.
